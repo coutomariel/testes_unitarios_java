@@ -3,6 +3,7 @@ package br.ce.wcaquino.servicos;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
+import br.ce.wcaquino.exceptions.LocadoraException;
 import br.ce.wcaquino.utils.DataUtils;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -82,12 +83,37 @@ public class LocacaoServiceTest {
         LocacaoService service = new LocacaoService();
         Usuario usuario = new Usuario("Mariel");
         Filme filme = new Filme("O Regresso", 0, 5.00);
-        Date dataEsperada = adicionarDias(new Date(), 2);
 
         exception.expect(Exception.class);
         exception.expectMessage("Filme não disponível em estoque");
 
         // Execução
         service.alugarFilme(usuario, filme);
+    }
+
+    @Test
+    public void testLocacao_UsuarioVazio() throws Exception {
+        // Cenário
+        LocacaoService service = new LocacaoService();
+        Filme filme = new Filme("O Regresso", 0, 5.00);
+
+        try {
+            service.alugarFilme(null, filme);
+            Assert.fail("Deveria lançar excessão");
+        } catch (LocadoraException e) {
+            Assert.assertThat(e.getMessage(), is("Usuario vazio"));
+        }
+    }
+
+    @Test
+    public void testLocacao_FilmeVazio() throws Exception {
+        // Cenário
+        LocacaoService service = new LocacaoService();
+        Usuario usuario = new Usuario("Mariel");
+
+        exception.expect(LocadoraException.class);
+        exception.expectMessage("Filme vazio");
+
+        service.alugarFilme(usuario, null);
     }
 }
