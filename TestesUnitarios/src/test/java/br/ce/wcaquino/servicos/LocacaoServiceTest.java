@@ -5,13 +5,12 @@ import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exceptions.LocadoraException;
 import br.ce.wcaquino.utils.DataUtils;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
 import java.util.Date;
+import java.util.logging.Logger;
 
 import static br.ce.wcaquino.utils.DataUtils.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -26,6 +25,19 @@ public class LocacaoServiceTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
+    private LocacaoService service;
+
+    /**
+     * @Before - Executa antes de cada método de teste
+     * @After - Executa após de cada método de teste
+     * @BeforeClass - Executa antes da execução da classe
+     * @AfterClass  - Executa após da execução da classe
+     */
+    @Before
+    public void setUp() {
+        service = new LocacaoService();
+    }
+
     @Test
     public void testeLocacao() throws Exception {
         // Cenário
@@ -34,7 +46,7 @@ public class LocacaoServiceTest {
         Date dataEsperada = adicionarDias(new Date(), 2);
 
         // Execução
-        Locacao locacao = new LocacaoService().alugarFilme(usuario, filme);
+        Locacao locacao = service.alugarFilme(usuario, filme);
 
         // Validação
         assertTrue(locacao.getValor() == 5.0);
@@ -55,7 +67,7 @@ public class LocacaoServiceTest {
         Date dataEsperada = adicionarDias(new Date(), 2);
 
         // Execução
-        Locacao locacao = new LocacaoService().alugarFilme(usuario, filme);
+        Locacao locacao = service.alugarFilme(usuario, filme);
     }
 
     @Test
@@ -64,9 +76,6 @@ public class LocacaoServiceTest {
         Usuario usuario = new Usuario("Mariel");
         Filme filme = new Filme("O Regresso", 0, 5.00);
         Date dataEsperada = adicionarDias(new Date(), 2);
-
-        // Execução
-        LocacaoService service = new LocacaoService();
 
         try {
             service.alugarFilme(usuario, filme);
@@ -80,7 +89,6 @@ public class LocacaoServiceTest {
     @Test
     public void testLocacao_FilmeSemEstoque3() throws Exception {
         // Cenário
-        LocacaoService service = new LocacaoService();
         Usuario usuario = new Usuario("Mariel");
         Filme filme = new Filme("O Regresso", 0, 5.00);
 
@@ -94,7 +102,6 @@ public class LocacaoServiceTest {
     @Test
     public void testLocacao_UsuarioVazio() throws Exception {
         // Cenário
-        LocacaoService service = new LocacaoService();
         Filme filme = new Filme("O Regresso", 0, 5.00);
 
         try {
@@ -108,7 +115,6 @@ public class LocacaoServiceTest {
     @Test
     public void testLocacao_FilmeVazio() throws Exception {
         // Cenário
-        LocacaoService service = new LocacaoService();
         Usuario usuario = new Usuario("Mariel");
 
         exception.expect(LocadoraException.class);
