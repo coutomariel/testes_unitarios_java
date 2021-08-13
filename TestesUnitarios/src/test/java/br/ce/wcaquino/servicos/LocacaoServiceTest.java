@@ -9,7 +9,10 @@ import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static br.ce.wcaquino.utils.DataUtils.*;
@@ -42,11 +45,13 @@ public class LocacaoServiceTest {
     public void testeLocacao() throws Exception {
         // Cenário
         Usuario usuario = new Usuario("Mariel");
+
         Filme filme = new Filme("O Regresso", 1, 5.00);
+        List<Filme> filmes = Arrays.asList(filme);
         Date dataEsperada = adicionarDias(new Date(), 2);
 
         // Execução
-        Locacao locacao = service.alugarFilme(usuario, filme);
+        Locacao locacao = service.alugarFilme(usuario, filmes);
 
         // Validação
         assertTrue(locacao.getValor() == 5.0);
@@ -64,10 +69,11 @@ public class LocacaoServiceTest {
         // Cenário
         Usuario usuario = new Usuario("Mariel");
         Filme filme = new Filme("O Regresso", 0, 5.00);
+        List<Filme> filmes = Arrays.asList(filme);
         Date dataEsperada = adicionarDias(new Date(), 2);
 
         // Execução
-        Locacao locacao = service.alugarFilme(usuario, filme);
+        Locacao locacao = service.alugarFilme(usuario, filmes);
     }
 
     @Test
@@ -77,8 +83,10 @@ public class LocacaoServiceTest {
         Filme filme = new Filme("O Regresso", 0, 5.00);
         Date dataEsperada = adicionarDias(new Date(), 2);
 
+        List<Filme> filmes = Arrays.asList(filme);
+
         try {
-            service.alugarFilme(usuario, filme);
+            service.alugarFilme(usuario, filmes);
             Assert.fail("Deveria ter lançado uma excessão");
         } catch (Exception e) {
             assertThat(e.getMessage(), is("Filme não disponível em estoque"));
@@ -91,21 +99,22 @@ public class LocacaoServiceTest {
         // Cenário
         Usuario usuario = new Usuario("Mariel");
         Filme filme = new Filme("O Regresso", 0, 5.00);
+        List<Filme> filmes = Arrays.asList(filme);
 
         exception.expect(Exception.class);
         exception.expectMessage("Filme não disponível em estoque");
 
         // Execução
-        service.alugarFilme(usuario, filme);
+        service.alugarFilme(usuario, filmes);
     }
 
     @Test
     public void testLocacao_UsuarioVazio() throws Exception {
         // Cenário
         Filme filme = new Filme("O Regresso", 0, 5.00);
-
+        List<Filme> filmes = Arrays.asList(filme);
         try {
-            service.alugarFilme(null, filme);
+            service.alugarFilme(null, filmes);
             Assert.fail("Deveria lançar excessão");
         } catch (LocadoraException e) {
             Assert.assertThat(e.getMessage(), is("Usuario vazio"));
