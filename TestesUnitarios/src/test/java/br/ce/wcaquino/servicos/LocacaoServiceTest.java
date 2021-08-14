@@ -42,7 +42,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testeLocacao() throws Exception {
+    public void deveAlugarFilme() throws Exception {
         // Cenário
         Usuario usuario = new Usuario("Mariel");
 
@@ -65,7 +65,7 @@ public class LocacaoServiceTest {
     }
 
     @Test(expected = Exception.class)
-    public void testLocacao_FilmeSemEstoque() throws Exception {
+    public void naoDeveAlugarFilmeSemEstoque() throws Exception {
         // Cenário
         Usuario usuario = new Usuario("Mariel");
         Filme filme = new Filme("O Regresso", 0, 5.00);
@@ -77,7 +77,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testLocacao_FilmeSemEstoque2() throws Exception {
+    public void naoDeveAlugarFilmeSemEstoque2() throws Exception {
         // Cenário
         Usuario usuario = new Usuario("Mariel");
         Filme filme = new Filme("O Regresso", 0, 5.00);
@@ -95,7 +95,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testLocacao_FilmeSemEstoque3() throws Exception {
+    public void naoDeveAlugarFilmeSemEstoque3() throws Exception {
         // Cenário
         Usuario usuario = new Usuario("Mariel");
         Filme filme = new Filme("O Regresso", 0, 5.00);
@@ -109,7 +109,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testLocacao_UsuarioVazio() throws Exception {
+    public void naoDeveAlugarFilmeSemUsuario() throws Exception {
         // Cenário
         Filme filme = new Filme("O Regresso", 0, 5.00);
         List<Filme> filmes = Arrays.asList(filme);
@@ -122,7 +122,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testLocacao_FilmeVazio() throws Exception {
+    public void naoDeveRealizarLocacaoSemFilme() throws Exception {
         // Cenário
         Usuario usuario = new Usuario("Mariel");
 
