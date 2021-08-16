@@ -9,16 +9,14 @@ import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static br.ce.wcaquino.utils.DataUtils.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.*;
 
 public class LocacaoServiceTest {
 
@@ -34,7 +32,7 @@ public class LocacaoServiceTest {
      * @Before - Executa antes de cada método de teste
      * @After - Executa após de cada método de teste
      * @BeforeClass - Executa antes da execução da classe
-     * @AfterClass  - Executa após da execução da classe
+     * @AfterClass - Executa após da execução da classe
      */
     @Before
     public void setUp() {
@@ -44,6 +42,7 @@ public class LocacaoServiceTest {
     @Test
     public void deveAlugarFilme() throws Exception {
         // Cenário
+        assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
         Usuario usuario = new Usuario("Mariel");
 
         Filme filme = new Filme("O Regresso", 1, 5.00);
@@ -131,4 +130,92 @@ public class LocacaoServiceTest {
 
         service.alugarFilme(usuario, null);
     }
+
+    @Test
+    public void devePagar75percTerceiroFilme() throws Exception {
+        // Cenário
+        Usuario usuario = new Usuario("Mariel");
+
+        Filme filme1 = new Filme("O Regresso", 1, 4.00);
+        Filme filme2 = new Filme("Clube da luta", 1, 4.00);
+        Filme filme3 = new Filme("Gladiador", 1, 4.00);
+        List<Filme> filmes = Arrays.asList(filme1, filme2, filme3);
+
+        // Ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        // Validação
+        assertThat(locacao.getValor(), is(11d));
+
+    }
+
+    @Test
+    public void devePagar50percQuartoFilme() throws Exception {
+        // Cenário
+        Usuario usuario = new Usuario("Mariel");
+
+        Filme filme1 = new Filme("O Regresso", 1, 4.00);
+        Filme filme2 = new Filme("Clube da luta", 1, 4.00);
+        Filme filme3 = new Filme("Gladiador", 1, 4.00);
+        Filme filme4 = new Filme("MIB III", 1, 4.00);
+        List<Filme> filmes = Arrays.asList(filme1, filme2, filme3, filme4);
+
+        // Ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        // Validação
+        assertThat(locacao.getValor(), is(13d));
+
+    }
+
+    @Test
+    public void devePagar25percQuintoFilme() throws Exception {
+        // Cenário
+        Usuario usuario = new Usuario("Mariel");
+
+        Filme filme1 = new Filme("O Regresso", 1, 4.00);
+        Filme filme2 = new Filme("Clube da luta", 1, 4.00);
+        Filme filme3 = new Filme("Gladiador", 1, 4.00);
+        Filme filme4 = new Filme("MIB III", 1, 4.00);
+        Filme filme5 = new Filme("O homem que mudou o jogo", 1, 4.00);
+        List<Filme> filmes = Arrays.asList(filme1, filme2, filme3, filme4, filme5);
+
+        // Ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        // Validação
+        assertThat(locacao.getValor(), is(14d));
+
+    }
+
+    @Test
+    public void deveLevarSextoFilmeSemCusto() throws Exception {
+        // Cenário
+        Usuario usuario = new Usuario("Mariel");
+
+        Filme filme1 = new Filme("O Regresso", 1, 4.00);
+        Filme filme2 = new Filme("Clube da luta", 1, 4.00);
+        Filme filme3 = new Filme("Gladiador", 1, 4.00);
+        Filme filme4 = new Filme("MIB III", 1, 4.00);
+        Filme filme5 = new Filme("O homem que mudou o jogo", 1, 4.00);
+        Filme filme6 = new Filme("007- Cassino Royale", 1, 4.00);
+        List<Filme> filmes = Arrays.asList(filme1, filme2, filme3, filme4, filme5, filme6);
+
+        // Ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        // Validação
+        assertThat(locacao.getValor(), is(14d));
+
+    }
+
+    @Test
+//    @Ignore
+    public void naoDeveDevolverFilmeNoDomingo() {
+        assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+
+
+
+    }
+
 }

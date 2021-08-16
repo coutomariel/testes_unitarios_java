@@ -24,12 +24,30 @@ public class LocacaoService {
 
         Double totalVlLocacao = 0.0;
 
-        for (Filme filme : filmes) {
-            if (filme.getEstoque() == 0) {
+        for (int i = 0; i < filmes.size(); i++) {
+            if (filmes.get(i).getEstoque() == 0) {
                 throw new FilmeSemEstoqueException("Filme não disponível em estoque");
             }
-            totalVlLocacao += filme.getPrecoLocacao();
+            switch (i) {
+                case 2 :
+                    totalVlLocacao += filmes.get(i).getPrecoLocacao() * 0.75;
+                    break;
+                case 3:
+                    totalVlLocacao += filmes.get(i).getPrecoLocacao() * 0.5;
+                    break;
+                case 4:
+                    totalVlLocacao += filmes.get(i).getPrecoLocacao() * 0.25;
+                    break;
+                case 5:
+                    totalVlLocacao += filmes.get(i).getPrecoLocacao() * 0;
+                    break;
+                default:
+                    totalVlLocacao += filmes.get(i).getPrecoLocacao();
+                    break;
+            }
+
         }
+
         Locacao locacao = new Locacao();
         locacao.setFilme(filmes);
         locacao.setUsuario(usuario);
