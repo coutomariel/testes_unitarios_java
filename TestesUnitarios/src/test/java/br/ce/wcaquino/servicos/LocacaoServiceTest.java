@@ -4,6 +4,8 @@ import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exceptions.LocadoraException;
+import br.ce.wcaquino.servicos.matchers.CustomMatchers;
+import br.ce.wcaquino.servicos.matchers.DiaSemanaMatcher;
 import br.ce.wcaquino.utils.DataUtils;
 import org.junit.*;
 import org.junit.rules.ErrorCollector;
@@ -12,6 +14,7 @@ import org.junit.rules.ExpectedException;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static br.ce.wcaquino.servicos.matchers.CustomMatchers.*;
 import static br.ce.wcaquino.utils.DataUtils.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -57,6 +60,11 @@ public class LocacaoServiceTest {
 //        assertTrue(isMesmaData(locacao.getDataLocacao(), new Date()));
         assertThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
         assertThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
+
+//        Desafio
+        assertThat(locacao.getDataRetorno(), ehHojeComDiferencaDeDias(1));
+        assertThat(locacao.getDataRetorno(), ehDiaSeguinte());
+
 
         // Usando o error collector
         error.checkThat(locacao.getValor(), is(equalTo(5.0)));
@@ -133,10 +141,16 @@ public class LocacaoServiceTest {
 
     @Test
 //    @Ignore
-    public void naoDeveDevolverFilmeNoDomingo() {
+    public void naoDeveDevolverFilmeNoDomingo() throws Exception {
         assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+        Usuario usuario = new Usuario("Usuario 1");
+        Filme oRegresso = new Filme("O Regresso", 1, 4d);
 
+        Locacao locacao = service.alugarFilme(usuario, Arrays.asList(oRegresso));
 
+        assertThat(locacao.getDataRetorno(), new DiaSemanaMatcher(Calendar.MONDAY));
+        assertThat(locacao.getDataRetorno(), caiEm(Calendar.MONDAY));
+        assertThat(locacao.getDataRetorno(), caiNumaSegunda());
 
     }
 

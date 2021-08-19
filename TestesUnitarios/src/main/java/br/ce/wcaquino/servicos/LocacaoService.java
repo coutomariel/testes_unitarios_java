@@ -5,11 +5,15 @@ import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exceptions.FilmeSemEstoqueException;
 import br.ce.wcaquino.exceptions.LocadoraException;
+import br.ce.wcaquino.utils.DataUtils;
 
+import javax.xml.crypto.Data;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import static br.ce.wcaquino.utils.DataUtils.adicionarDias;
+import static br.ce.wcaquino.utils.DataUtils.verificarDiaSemana;
 
 public class LocacaoService {
 
@@ -59,6 +63,10 @@ public class LocacaoService {
         //Entrega no dia seguinte
         Date dataEntrega = new Date();
         dataEntrega = adicionarDias(dataEntrega, 1);
+        if(verificarDiaSemana(dataEntrega, Calendar.SUNDAY)){
+            dataEntrega = adicionarDias(dataEntrega, 1);
+        }
+
         locacao.setDataRetorno(dataEntrega);
 
         //Salvando a locacao...
