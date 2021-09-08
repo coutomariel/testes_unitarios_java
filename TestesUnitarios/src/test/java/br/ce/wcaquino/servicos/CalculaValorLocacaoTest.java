@@ -12,9 +12,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static br.ce.wcaquino.servicos.builders.UsuarioBuilder.umUsuario;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.runners.Parameterized.*;
+import static org.junit.runners.Parameterized.Parameter;
+import static org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class CalculaValorLocacaoTest {
@@ -53,7 +55,7 @@ public class CalculaValorLocacaoTest {
 
     @Test
     public void deveCalcularValorLocacaoConsiderandoDescontos() throws Exception {
-        Usuario usuario = new Usuario("Usuario 1");
+        Usuario usuario = umUsuario().agora();
 
         Locacao locacao = service.alugarFilme(usuario, filmes);
 
