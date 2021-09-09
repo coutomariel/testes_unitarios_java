@@ -1,9 +1,11 @@
 package br.ce.wcaquino.servicos;
 
+import br.ce.wcaquino.daos.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exceptions.LocadoraException;
+import br.ce.wcaquino.exceptions.UsuarioNegativadoException;
 import br.ce.wcaquino.servicos.builders.FilmeBuilder;
 import br.ce.wcaquino.servicos.matchers.DiaSemanaMatcher;
 import br.ce.wcaquino.utils.DataUtils;
@@ -13,6 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -39,6 +42,8 @@ public class LocacaoServiceTest {
     public ExpectedException exception = ExpectedException.none();
 
     private LocacaoService service;
+    private SPCService spcService;
+    private LocacaoDao dao;
 
     /**
      * @Before - Executa antes de cada método de teste
@@ -49,6 +54,13 @@ public class LocacaoServiceTest {
     @Before
     public void setUp() {
         service = new LocacaoService();
+
+        dao = Mockito.mock(LocacaoDao.class);
+        service.setDao(dao);
+
+        spcService = Mockito.mock(SPCService.class);
+        service.setSpc(spcService);
+
     }
 
     @Test
@@ -162,6 +174,20 @@ public class LocacaoServiceTest {
         assertThat(locacao.getDataRetorno(), caiEm(Calendar.MONDAY));
         assertThat(locacao.getDataRetorno(), caiNumaSegunda());
 
+    }
+
+    @Test
+    public void naoDeveAlugarFilmeParaClienteNegativado() throws Exception {
+        // cenário
+        Usuario usuario = umUsuario().agora();
+        Filme oRegresso = umFilme().agora();
+
+        Mockito.when(spcService.possuiNegativacao(usuario)).thenReturn(true);
+
+        exception.expect(UsuarioNegativadoException.class);
+        exception.expectMessage("Usuario negativado");
+
+        service.alugarFilme(usuario, Arrays.asList(oRegresso));
     }
 
 }
