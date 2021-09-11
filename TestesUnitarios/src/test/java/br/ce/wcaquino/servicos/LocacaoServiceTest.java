@@ -7,6 +7,7 @@ import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exceptions.LocadoraException;
 import br.ce.wcaquino.exceptions.UsuarioNegativadoException;
 import br.ce.wcaquino.servicos.builders.FilmeBuilder;
+import br.ce.wcaquino.servicos.builders.LocacaoBuilder;
 import br.ce.wcaquino.servicos.matchers.DiaSemanaMatcher;
 import br.ce.wcaquino.utils.DataUtils;
 import org.junit.Assert;
@@ -15,6 +16,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.Arrays;
@@ -32,6 +34,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.*;
 
 public class LocacaoServiceTest {
 
@@ -44,6 +47,7 @@ public class LocacaoServiceTest {
     private LocacaoService service;
     private SPCService spcService;
     private LocacaoDao dao;
+    private EmailService emailService;
 
     /**
      * @Before - Executa antes de cada método de teste
@@ -55,11 +59,14 @@ public class LocacaoServiceTest {
     public void setUp() {
         service = new LocacaoService();
 
-        dao = Mockito.mock(LocacaoDao.class);
+        dao = mock(LocacaoDao.class);
         service.setDao(dao);
 
-        spcService = Mockito.mock(SPCService.class);
+        spcService = mock(SPCService.class);
         service.setSpc(spcService);
+
+        emailService = mock(EmailService.class);
+        service.setEmail(emailService);
 
     }
 
@@ -182,12 +189,40 @@ public class LocacaoServiceTest {
         Usuario usuario = umUsuario().agora();
         Filme oRegresso = umFilme().agora();
 
-        Mockito.when(spcService.possuiNegativacao(usuario)).thenReturn(true);
+        when(spcService.possuiNegativacao(usuario)).thenReturn(true);
 
-        exception.expect(UsuarioNegativadoException.class);
-        exception.expectMessage("Usuario negativado");
+//        exception.expect(UsuarioNegativadoException.class);
+//        exception.expectMessage("Usuario negativado");
 
-        service.alugarFilme(usuario, Arrays.asList(oRegresso));
+        try {
+            service.alugarFilme(usuario, Arrays.asList(oRegresso));
+            Assert.fail("Deveria falhar");
+        } catch (UsuarioNegativadoException e) {
+            Assert.assertThat(e.getMessage(), is("Usuario negativado."));
+        }
+        verify(spcService).possuiNegativacao(usuario);
+
+    }
+
+    @Test
+    public void deveNotificarUsuariosComDevolucoesPendentes() {
+        // cenário
+        Usuario usuario = umUsuario().agora();
+        Filme oRegresso = umFilme().agora();
+
+        List<Locacao> locacoes = Arrays.asList(
+                LocacaoBuilder.umaLocacao()
+                        .comOsFilmes(Arrays.asList(oRegresso))
+                        .comUsuario(usuario)
+                        .comRetornoPara(DataUtils.obterData(9, 9, 21))
+                        .agora());
+
+        when(dao.buscaLocacoes()).thenReturn(locacoes);
+
+        service.notificaUsuariosComDevolucoesPendentes();
+
+        verify(emailService).notificaAtrasoParaUsuario(usuario);
+
     }
 
 }
